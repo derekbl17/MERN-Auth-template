@@ -36,6 +36,11 @@ export default function Header() {
               {userInfo ? (
                 <>
                   <NavDropdown title={userInfo.name} id="username">
+                    {userInfo.role === "admin" && (
+                      <NavDropdown.Item as={NavLink} to="/admin/panel">
+                        Admin Panel
+                      </NavDropdown.Item>
+                    )}
                     <NavDropdown.Item as={NavLink} to="/profile">
                       Profile
                     </NavDropdown.Item>

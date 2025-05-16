@@ -10,11 +10,12 @@ const authUser=asyncHandler(async(req,res)=>{
     const user=await User.findOne({email})
 
     if (user && (await user.matchPasswords(password))){
-        generateToken(res,user._id)
+        generateToken(res,user._id,user.role)
         res.status(201).json({
             _id: user._id,
             name:user.name,
-            email:user,email
+            email:user.email,
+            role:user.role
         })
     } else{
         res.status(401);
@@ -41,11 +42,12 @@ const registerUser=asyncHandler(async(req,res)=>{
     })
 
     if (user){
-        generateToken(res,user._id)
+        generateToken(res,user._id,user.role)
         res.status(201).json({
             _id: user._id,
             name:user.name,
-            email:user,email
+            email:user.email,
+            role:user.role
         })
     } else{
         res.status(400);
@@ -69,11 +71,26 @@ const getUser=asyncHandler(async(req,res)=>{
     const user = {
         _id: req.user._id,
         name: req.user.name,
-        email: req.user.email
+        email: req.user.email,
     }
 
     res.status(200).json({user})
 })
+
+const confirmUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.userId).select('-password');
+    if (user) {
+      res.json({
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  });
 
 // Update user profile
 // PUT /api/users/profile
@@ -90,7 +107,8 @@ const updateUser=asyncHandler(async(req,res)=>{
         res.status(200).json({
             _id:updatedUser._id,
             name:updatedUser.name,
-            email:updatedUser.email
+            email:updatedUser.email,
+            role:user.role
         })
     }else{
         res.status(404).json({message:'User not found'})
@@ -102,5 +120,6 @@ module.exports = {
     registerUser,
     logoutUser,
     getUser,
-    updateUser
+    updateUser,
+    confirmUser
 };
