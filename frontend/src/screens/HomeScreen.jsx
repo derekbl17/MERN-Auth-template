@@ -1,7 +1,14 @@
 import Hero from "../components/Hero";
+import { useAuth } from "../context/authContext";
 
 const HomeScreen = () => {
-  return <Hero />;
+  const { user } = useAuth();
+  if (!user) return <Hero />;
+  return (
+    <>
+      <h1>Hello {user.name}!</h1>
+    </>
+  );
 };
 
 export default HomeScreen;

@@ -9,7 +9,12 @@ const authUser=asyncHandler(async(req,res)=>{
 
     const user=await User.findOne({email})
 
+    
+
     if (user && (await user.matchPasswords(password))){
+        if (user.role==='blocked' ){
+            return res.status(401).json({message:'Your account has been blocked'})
+        }
         generateToken(res,user._id,user.role)
         res.status(201).json({
             _id: user._id,
@@ -81,7 +86,7 @@ const confirmUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.userId).select('-password');
     if (user) {
       res.json({
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role
@@ -95,7 +100,7 @@ const confirmUser = asyncHandler(async (req, res) => {
 // Update user profile
 // PUT /api/users/profile
 const updateUser=asyncHandler(async(req,res)=>{
-    const user=await User.findById(req.user._id);
+    const user=await User.findById(req.user.userId);
     if(user){
         user.name=req.body.name || user.name;
         user.email=req.body.email || user.email;
@@ -115,11 +120,44 @@ const updateUser=asyncHandler(async(req,res)=>{
     }
 })
 
+const getAllUsers=asyncHandler(async(req,res)=>{
+    const users=await User.find({role:{$ne:'admin'}}).exec()
+    res.status(200).json(users)
+})
+
+const deleteUser=asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.params.id);
+    if(!user)return res.status(404).json({message:'user does not exist!'});
+
+    await User.findByIdAndDelete(req.params.id)
+    res.status(200).json({id:req.params.id})
+})
+
+const toggleBlock=asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.params.id);
+    if(!user)return res.status(404).json({message:'user does not exist!'});
+
+    let set;
+
+    user.role==='user' ? set='blocked' : set='user'
+        
+    await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            role:set
+        }
+    )
+    res.status(200).json({message:`user ${user.name} status was set to ${set}`})
+})
+
 module.exports = {
     authUser,
     registerUser,
     logoutUser,
     getUser,
     updateUser,
-    confirmUser
+    confirmUser,
+    getAllUsers,
+    deleteUser,
+    toggleBlock
 };

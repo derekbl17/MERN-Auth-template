@@ -1,38 +1,32 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
 import FormContainer from "../components/FormContainer";
-import { useLoginMutation } from "../slices/usersApiSlice";
-import { setCredentials } from "../slices/authSlice";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
+import { useAuth } from "../context/authContext";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const [login, { isLoading }] = useLoginMutation();
-
-  const { userInfo } = useSelector((state) => state.auth);
+  const { user, login, isLoading } = useAuth();
 
   useEffect(() => {
-    if (userInfo) {
+    if (user) {
       navigate("/");
     }
-  }, [navigate, userInfo]);
+  }, [navigate, user]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await login({ email, password }).unwrap();
-      dispatch(setCredentials({ ...res }));
+      await login({ email, password });
       navigate("/");
     } catch (err) {
-      toast.error(err?.data?.message || err.error);
+      toast.error(err?.message);
     }
   };
   return (
@@ -65,7 +59,10 @@ const LoginScreen = () => {
         </Button>
         <Row className="py-3">
           <Col>
-            New Customer? <Link to="/register">Register</Link>
+            New Customer?{" "}
+            <Link to="/register" className="text-warning">
+              Register
+            </Link>
           </Col>
         </Row>
       </Form>

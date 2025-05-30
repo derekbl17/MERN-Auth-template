@@ -1,22 +1,23 @@
 import { Navbar, Nav, Container, NavDropdown, Badge } from "react-bootstrap";
-import { FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
-import { useSelector, useDispatch } from "react-redux";
+import {
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaUser,
+  FaCog,
+  FaUserCircle,
+  FaUserPlus,
+} from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useLogoutMutation } from "../slices/usersApiSlice";
-import { clearCredentials } from "../slices/authSlice";
+import { useAuth } from "../context/authContext";
 
 export default function Header() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { logout, user } = useAuth();
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const [logoutApiCall] = useLogoutMutation();
 
   const logoutHandler = async () => {
     try {
-      await logoutApiCall().unwrap();
-      dispatch(clearCredentials());
+      await logout();
       navigate("/");
     } catch (err) {
       console.log(err);
@@ -25,37 +26,85 @@ export default function Header() {
 
   return (
     <header>
-      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+      <Navbar
+        bg="dark"
+        variant="dark"
+        expand="lg"
+        className=" border-bottom border-warning"
+        collapseOnSelect
+      >
         <Container>
-          <Navbar.Brand as={NavLink} to="/">
-            MERN Auth
+          <Navbar.Brand
+            as={NavLink}
+            to="/"
+            className="d-flex align-items-center"
+          >
+            <img
+              alt="Poster"
+              style={{ height: "80px" }} // Control image size
+            />
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+
+          <Navbar.Toggle aria-controls="main-navbar" />
+
+          <Navbar.Collapse id="main-navbar">
             <Nav className="ms-auto">
-              {userInfo ? (
+              {user ? (
                 <>
-                  <NavDropdown title={userInfo.name} id="username">
-                    {userInfo.role === "admin" && (
-                      <NavDropdown.Item as={NavLink} to="/admin/panel">
-                        Admin Panel
-                      </NavDropdown.Item>
+                  <NavDropdown
+                    title={
+                      <>
+                        <FaUser /> {user.name}
+                      </>
+                    }
+                    id="user-dropdown"
+                    align="end"
+                    className="hover-bg-primary-dark"
+                    menuVariant="dark"
+                  >
+                    {user.role === "admin" && (
+                      <>
+                        <NavDropdown.Item
+                          as={NavLink}
+                          to="/admin/panel"
+                          className="dropdown-item-hover"
+                        >
+                          <FaCog /> Admin Panel
+                        </NavDropdown.Item>
+                      </>
                     )}
-                    <NavDropdown.Item as={NavLink} to="/profile">
-                      Profile
+                    <NavDropdown.Item
+                      as={NavLink}
+                      to="/profile"
+                      className="dropdown-item-hover"
+                    >
+                      <FaUserCircle /> Profile
                     </NavDropdown.Item>
-                    <NavDropdown.Item onClick={logoutHandler}>
-                      Logout
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item
+                      onClick={logoutHandler}
+                      className="dropdown-item-hover text-danger"
+                    >
+                      <FaSignOutAlt /> Logout
                     </NavDropdown.Item>
                   </NavDropdown>
                 </>
               ) : (
                 <>
-                  <Nav.Link as={NavLink} to="/login">
-                    <FaSignInAlt /> Sign In
+                  <Nav.Link
+                    as={NavLink}
+                    to="/login"
+                    className="px-3 py-2 hover-bg-primary-dark"
+                  >
+                    <FaSignInAlt className="me-1" /> Sign In
                   </Nav.Link>
-                  <Nav.Link as={NavLink} to="/register">
-                    <FaSignOutAlt /> Sign up
+
+                  <Nav.Link
+                    as={NavLink}
+                    to="/register"
+                    className="px-3 py-2 hover-bg-primary-dark"
+                  >
+                    <FaUserPlus className="me-1" /> Sign Up
                   </Nav.Link>
                 </>
               )}

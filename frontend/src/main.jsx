@@ -1,10 +1,9 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import store from "./store.js";
-import { Provider } from "react-redux";
+import { AuthProvider } from "./context/authContext.jsx";
 import App from "./App.jsx";
 import HomeScreen from "./screens/HomeScreen.jsx";
 import LoginScreen from "./screens/LoginScreen.jsx";
@@ -14,6 +13,8 @@ import PrivateRoute from "./components/PrivateRoute.jsx";
 import AdminScreen from "./screens/AdminScreen.jsx";
 import NotFoundScreen from "./screens/NotFoundScreen.jsx";
 import NoAuthorization from "./screens/NoAuthorization.jsx";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -40,9 +41,9 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <RouterProvider router={router} />
-    </StrictMode>
-  </Provider>
+    </AuthProvider>
+  </QueryClientProvider>
 );

@@ -1,10 +1,29 @@
-root folder needs a .env file
-the structure of .env is like so:
-NODE_ENV = development
-PORT = 5001
-MONGO_URI=mongodb+srv:// and the rest of mongodb url, past .net/name
-JWT_SECRET= any secret word/key for encryption
 
-will have to go into both backend and frontend folders to run npm i to get all dependencies.
+# Template with vite+react+mongodb+tanstack+jwt cookie auth
 
-to run everything from root folder "npm run dev"
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file in root folder
+
+`NODE_ENV = development`
+
+`PORT`
+
+`MONGO_URI`
+
+`JWT_SECRET`
+
+
+## Build and run
+
+To build, from root:
+
+```bash
+  npm run build
+```
+
+Then launch:
+
+```bash
+  npm run dev
+```

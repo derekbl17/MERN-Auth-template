@@ -1,49 +1,46 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
-import { useRegisterMutation } from "../slices/usersApiSlice";
-import { setCredentials } from "../slices/authSlice";
+// import { useRegisterMutation } from "../slices/usersApiSlice";
+// import { setCredentials } from "../slices/authSlice";
+import { useAuth } from "../context/authContext";
+import { useMutation } from "@tanstack/react-query";
+import { registerUser } from "../api/user";
 
 const RegisterScreen = () => {
+  const { user, isLoading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const { userInfo } = useSelector((state) => state.auth);
-
-  const [register, { isLoading }] = useRegisterMutation();
-
-  useEffect(() => {
-    if (userInfo) {
+  const registerMutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: () => {
       navigate("/");
-    }
-  }, [navigate, userInfo]);
+      window.location.reload();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Registration failed");
+    },
+  });
 
   const submitHandler = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
-    } else {
-      try {
-        const res = await register({ name, email, password }).unwrap();
-        dispatch(setCredentials({ ...res }));
-        navigate("/");
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
     }
+    registerMutation.mutate({ name, email, password });
   };
+
   return (
     <FormContainer>
-      <h1>Sign In</h1>
+      <h1>Sign up</h1>
       <Form onSubmit={submitHandler}>
         <Form.Group className="my-2" controlId="name">
           <Form.Label>User Name</Form.Label>
@@ -85,15 +82,23 @@ const RegisterScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        {isLoading && <Loader />}
+        {registerMutation.isPending && <Loader />}
 
-        <Button type="submit" variant="primary" className="mt-3">
+        <Button
+          type="submit"
+          variant="primary"
+          className="mt-3"
+          disabled={registerMutation.isPending}
+        >
           Sign Up
         </Button>
 
         <Row className="py-3">
           <Col>
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account?{" "}
+            <Link to="/login" className="text-warning">
+              Login
+            </Link>
           </Col>
         </Row>
       </Form>

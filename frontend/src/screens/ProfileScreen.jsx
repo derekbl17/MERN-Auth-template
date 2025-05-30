@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Form, Button } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
-import { setCredentials } from "../slices/authSlice";
-import { useUpdateUserMutation } from "../slices/usersApiSlice";
+import { useUpdateUserMutation } from "../api/user";
+import { useAuth } from "../context/authContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ProfileScreen = () => {
   const [name, setName] = useState("");
@@ -13,16 +13,18 @@ const ProfileScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { user, isLoading } = useAuth();
 
-  const [updateProfile, { isLoading }] = useUpdateUserMutation();
+  const { mutateAsync: updateUser, isPending } = useUpdateUserMutation();
 
   useEffect(() => {
-    setName(userInfo.name);
-    setEmail(userInfo.email);
-  }, [userInfo.setName, userInfo.email]);
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+    }
+  }, [user]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -30,13 +32,14 @@ const ProfileScreen = () => {
       toast.error("Passwords do not match");
     } else {
       try {
-        const res = await updateProfile({
-          _id: userInfo._id,
+        console.log("trying update");
+        const res = await updateUser({
+          _id: user._id,
           name,
           email,
           password,
-        }).unwrap();
-        dispatch(setCredentials({ ...res }));
+        });
+        queryClient.setQueryData(["currentUser"], res);
         toast.success("Profile updated");
       } catch (err) {
         toast.error(err?.data?.message || err.error);

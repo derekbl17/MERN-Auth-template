@@ -9,8 +9,7 @@ const Hero = () => {
           <h1 className="text-center mb-4">MERN Authentication</h1>
           <p className="text-center mb-4">
             This is a boilerplate for MERN authentication that stores a JWT in
-            an HTTP-Only cookie. It also uses Redux Toolkit and the React
-            Bootstrap library
+            an HTTP-Only cookie. Tanstacked
           </p>
           <div className="d-flex">
             <Button variant="primary" as={Link} to="/login" className="me-3">

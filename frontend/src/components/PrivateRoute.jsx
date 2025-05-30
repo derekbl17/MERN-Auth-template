@@ -1,15 +1,15 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useAuth } from "../context/authContext";
 
 const PrivateRoute = ({ allowed }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { user, isLoading } = useAuth();
 
-  if (!userInfo) {
+  if (!user) {
     console.log("no user info");
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowed.includes(userInfo.role)) {
+  if (!allowed.includes(user.role)) {
     console.log("no authorization");
     return <Navigate to="/no-auth" replace />;
   }
