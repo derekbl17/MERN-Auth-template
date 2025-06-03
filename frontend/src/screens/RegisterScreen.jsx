@@ -1,17 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import FormContainer from "../components/FormContainer";
+import { FormContainer, Loader } from "../components";
 import { toast } from "react-toastify";
-import Loader from "../components/Loader";
-// import { useRegisterMutation } from "../slices/usersApiSlice";
-// import { setCredentials } from "../slices/authSlice";
-import { useAuth } from "../context/authContext";
 import { useMutation } from "@tanstack/react-query";
 import { registerUser } from "../api/user";
 
 const RegisterScreen = () => {
-  const { user, isLoading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

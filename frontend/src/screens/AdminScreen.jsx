@@ -1,6 +1,5 @@
 import { Container, Row, Col, Card } from "react-bootstrap";
-import AdminMenu from "./AdminMenu";
-import AdminUserList from "./AdminUserList";
+import { AdminMenu, AdminUserList } from "../components";
 
 const AdminScreen = () => {
   return (

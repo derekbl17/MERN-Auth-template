@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import FormContainer from "../components/FormContainer";
+import { FormContainer, Loader } from "../components";
 import { toast } from "react-toastify";
-import Loader from "../components/Loader";
 import { useAuth } from "../context/authContext";
 
 const LoginScreen = () => {

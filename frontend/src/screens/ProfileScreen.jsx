@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
-import FormContainer from "../components/FormContainer";
+import { FormContainer, Loader } from "../components";
 import { toast } from "react-toastify";
-import Loader from "../components/Loader";
 import { useUpdateUserMutation } from "../api/user";
 import { useAuth } from "../context/authContext";
 import { useQueryClient } from "@tanstack/react-query";
